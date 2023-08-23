@@ -1,9 +1,10 @@
 openy_hours_formatter:
-  version: 0.1
+  version: 0.2
   js:
     js/openy_hours_formatter.js: {}
   dependencies:
     - core/jquery
+    - core/once
     - core/drupal
     - core/drupalSettings
     - openy_system/moment

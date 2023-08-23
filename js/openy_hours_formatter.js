@@ -1,9 +1,9 @@
-(function ($) {
+(function ($, once) {
 
   "use strict";
   Drupal.behaviors.openy_hours_formatter = {
     attach: function (context, settings) {
-      $('.today-hours .show-link').once().on('click', function (e) {
+      $(once('today-hours-show-link', '.today-hours .show-link')).on('click', function (e) {
         e.preventDefault();
         $(this)
           .addClass('hidden')
@@ -12,7 +12,7 @@
           .parent()
           .find('.branch-hours').removeClass('hidden');
       });
-      $('.today-hours .hide-link').once().on('click', function (e) {
+      $(once('today-hours-hide-link', '.today-hours .hide-link')).on('click', function (e) {
         e.preventDefault();
         $(this)
           .addClass('hidden')
@@ -113,4 +113,4 @@
     }
 
   };
-})(jQuery);
+})(jQuery, once);
