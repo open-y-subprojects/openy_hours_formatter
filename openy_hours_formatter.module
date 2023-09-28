@@ -72,16 +72,14 @@ function openy_hours_formatter_tokens($type, $tokens, array $data, array $option
       $opens = [];
       $closes = [];
       foreach ($days as $key => $day) {
+        // If we can find hours, set them, otherwise Google recommends
+        // "set both opens and closes properties to '00:00'" for closed.
         if ($hours = $node->field_branch_hours->{'hours_'.$key}) {
           // Find a non-digit, non-word, non-whitespace character and split,
           // and automagically return the full string if no match.
           $hours = preg_split('/\s?[^\s\w:\.]\s?/',$hours, -1, PREG_SPLIT_NO_EMPTY);
-          $opens[$key] = date('H:i', strtotime($hours[0]));
-          $closes[$key] = $hours[1] ? date('H:i', strtotime($hours[1])): '';
-        }
-        else {
-          $opens[$key] = '00:00';
-          $closes[$key] = '00:00';
+          $opens[$key] = strtotime($hours[0]) ? date('H:i', strtotime($hours[0])) : '00:00';
+          $closes[$key] = (isset($hours[1]) && strtotime($hours[1])) ? date('H:i', strtotime($hours[1])): '00:00';
         }
       }
       foreach ($tokens as $name => $original) {
