@@ -79,7 +79,8 @@ function openy_hours_formatter_tokens($type, $tokens, array $data, array $option
           // and automagically return the full string if no match.
           $hours = preg_split('/\s?[^\s\w:\.]\s?/',$hours, -1, PREG_SPLIT_NO_EMPTY);
           $opens[$key] = strtotime($hours[0]) ? date('H:i', strtotime($hours[0])) : '00:00';
-          $closes[$key] = key_exists(1, $hours) ? date('H:i', strtotime($hours[1])): '';
+          // If $hours[1] is not set, use an empty string as the default value.
+          $closes[$key] = date('H:i', strtotime($hours[1] ?? ''));
         }
       }
       foreach ($tokens as $name => $original) {
