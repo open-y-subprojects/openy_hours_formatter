@@ -1,9 +1,9 @@
 name: Open Y Hours Formatter
 type: module
 description: Provides a formatter to display working hours.
-core_version_requirement: ^8.8 || ^9 || ^10
-version: 1.2.0
-package: Open Y
+core_version_requirement: ^10 || ^11
+version: 2.0.0
+package: YMCA Website Services
 dependencies:
   - openy_field_hours:openy_field_hours
   - openy_system:openy_system
