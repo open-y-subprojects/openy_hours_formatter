@@ -31,7 +31,7 @@
         const observer = new MutationObserver(function (mutations) {
           mutations.forEach(function (mutation) {
             mutation.addedNodes.forEach(function (node) {
-              if (node.nodeType === 1 && node.classList && node.classList.contains('leaflet-popup')) {
+              if (node.nodeType === Node.ELEMENT_NODE && node.classList && node.classList.contains('leaflet-popup')) {
                 Drupal.attachBehaviors(node, settings);
               }
             });
