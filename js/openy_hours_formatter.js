@@ -24,6 +24,27 @@
     }
   };
 
+  // Applied show/hide today hours functionality for Map.
+  Drupal.behaviors.leafletPopupObserver = {
+    attach: function (context, settings) {
+      $(once('leaflet-observer', 'body', context)).each(function () {
+        const observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            mutation.addedNodes.forEach(function (node) {
+              if (node.nodeType === Node.ELEMENT_NODE && node.classList && node.classList.contains('leaflet-popup')) {
+                Drupal.attachBehaviors(node, settings);
+              }
+            });
+          });
+        });
+        
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      });
+    }
+  };
   Drupal.behaviors.today_hours = {
 
     /**
