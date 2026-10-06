@@ -75,12 +75,39 @@ function openy_hours_formatter_tokens($type, $tokens, array $data, array $option
         // If we can find hours, set them, otherwise Google recommends
         // "set both opens and closes properties to '00:00'" for closed.
         if ($hours = $node->field_branch_hours->{'hours_'.$key}) {
-          // Find a non-digit, non-word, non-whitespace character and split,
-          // and automagically return the full string if no match.
-          $hours = preg_split('/\s?[^\s\w:\.]\s?/',$hours, -1, PREG_SPLIT_NO_EMPTY);
-          $opens[$key] = strtotime($hours[0]) ? date('H:i', strtotime($hours[0])) : '00:00';
-          // If $hours[1] is not set, use an empty string as the default value.
-          $closes[$key] = date('H:i', strtotime($hours[1] ?? ''));
+          // Use only the leading time range so trailing notes such as
+          // "Closed July 4th" cannot corrupt the closing time.
+          // A single clock time: an hour (8, 12), optional minutes (:30) and
+          // an optional am/pm marker, with or without periods (am, PM, a.m.).
+          $time = '\d{1,2}(?::\d{2})?\s?(?:[ap]\.?m\.?)?';
+          // Separator between the times: a hyphen, en dash (U+2013), em dash
+          // (U+2014) or the word "to".
+          $separator = '(?:-|\x{2013}|\x{2014}|to)';
+          // Match "<open> <separator> <close>" at the start of the string.
+          // There is no end anchor on purpose, so anything after the closing
+          // time (e.g. "Closed July 4th") is ignored. Flags: i makes it
+          // case-insensitive (PM/pm); u enables UTF-8 for the \x{...} dashes.
+          $pattern = '/^\s*(' . $time . ')\s*' . $separator . '\s*(' . $time . ')/iu';
+          if (preg_match($pattern, $hours, $matches)) {
+            // $matches[1] is the opening time, $matches[2] the closing time.
+            $hours = [$matches[1], $matches[2]];
+          }
+          else {
+            // No leading range found (e.g. "Closed"). Fall back to the
+            // original behaviour: split on a non-digit, non-word,
+            // non-whitespace character and return the full string if no match.
+            $hours = preg_split('/\s?[^\s\w:\.]\s?/', $hours, -1, PREG_SPLIT_NO_EMPTY);
+          }
+          $open = strtotime($hours[0] ?? '');
+          $close = strtotime($hours[1] ?? '');
+          // Never output a time we cannot parse; Google recommends "00:00" for
+          // both properties when closed.
+          $opens[$key] = $open && $close ? date('H:i', $open) : '00:00';
+          $closes[$key] = $open && $close ? date('H:i', $close) : '00:00';
+        }
+        else {
+          $opens[$key] = '00:00';
+          $closes[$key] = '00:00';
         }
       }
       foreach ($tokens as $name => $original) {
